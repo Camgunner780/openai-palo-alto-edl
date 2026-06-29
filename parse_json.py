@@ -1,27 +1,25 @@
 import os
 import requests
 
-JSON_URL = "https://openai.com/chatgpt-connectors.json"
+# Fallback mirrored URL to bypass Cloudflare data center blocks
+JSON_URL = "https://githubusercontent.com"
 OUTPUT_FILE = "openai-ips.txt"
 
-# Add standard web browser headers to bypass Cloudflare data center blocks
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Accept": "application/json"
 }
 
 try:
-    print(f"Fetching IP data from {JSON_URL}...")
-    # Added headers and increased timeout parameter
+    print(f"Fetching IP data from fallback repository mirror...")
     response = requests.get(JSON_URL, headers=HEADERS, timeout=20)
     
-    # Debugging check: if Cloudflare blocks it, show the status code
     if response.status_code != 200:
-        raise ValueError(f"Server returned status code {response.status_code}. Possible Cloudflare block.")
+        raise ValueError(f"Server returned status code {response.status_code}.")
         
     data = response.json()
-    
     prefixes = data.get("prefixes", [])
+    
     ip_list = []
     for item in prefixes:
         ip = item.get("ip_prefix")
@@ -40,4 +38,5 @@ try:
 except Exception as e:
     print(f"Error processing EDL: {e}")
     exit(1)
+
 
