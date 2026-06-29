@@ -1,8 +1,8 @@
 import os
 import requests
 
-# Fallback mirrored URL to bypass Cloudflare data center blocks
-JSON_URL = "https://githubusercontent.com"
+# Fixed the URL domain from githubusercontent.com to ://githubusercontent.com
+JSON_URL = "https://://githubusercontent.com/openai/openai-api-spec/main/profiles/chatgpt-connectors.json"
 OUTPUT_FILE = "openai-ips.txt"
 
 HEADERS = {
@@ -38,5 +38,6 @@ try:
 except Exception as e:
     print(f"Error processing EDL: {e}")
     exit(1)
+
 
 
