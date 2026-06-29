@@ -5,12 +5,10 @@ on:
     - cron: '0 4 * * *'  # Runs automatically every day at 4:00 AM UTC
   workflow_dispatch:      # Allows you to click a button to run it manually anytime
 
-# Prevents multiple deployments from trying to run at the exact same time
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
-# Grant permissions required for both committing code changes and deploying to GitHub Pages
 permissions:
   contents: write
   pages: write
@@ -23,12 +21,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Fetch and Process IP List via JQ
+      - name: Fetch and Process IP List via Text Scraper
         run: |
-          echo "Fetching verified mirror data..."
-          curl -s -A "Mozilla/5.0" "https://githubusercontent.com" | jq -r '.prefixes[].ip_prefix' > openai-ips.txt
+          echo "Downloading verified mirror text..."
+          # 1. Fetch raw data
+          # 2. Extract anything matching an IPv4 or IPv6 CIDR subnet block
+          # 3. Use '|| true' so grep doesn't cause a pipeline error if format shifts
+          curl -s -A "Mozilla/5.0" "https://githubusercontent.com" \
+
+          | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}\/[0-9]{1,2}|([0-9a-fA-F]{1,4}:){1,7}:?/[0-9]{1,3}' > openai-ips.txt || true
           
-          echo "Processing complete. Reviewing outputs:"
+          echo "Processing complete. File contents preview:"
           cat openai-ips.txt
 
       - name: Commit and Push changes back to code branch
