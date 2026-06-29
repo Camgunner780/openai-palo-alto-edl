@@ -12,13 +12,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Fetch and Process IP List
+      - name: Fetch and Process IP List via JQ
         run: |
-          echo "Fetching IP list via curl..."
-          # Fetch directly from the verified mirror and parse text lines
-          curl -s -A "Mozilla/5.0" "https://githubusercontent.com" | grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/[0-9]{1,2}' > openai-ips.txt
+          echo "Fetching verified mirror data..."
+          # Download file and parse the dynamic JSON blocks flawlessly using JQ
+          curl -s -A "Mozilla/5.0" "https://githubusercontent.com" | jq -r '.prefixes[].ip_prefix' > openai-ips.txt
           
-          echo "File processing complete. Checking output:"
+          echo "Processing complete. Reviewing outputs:"
           cat openai-ips.txt
 
       - name: Commit and Push changes
@@ -32,4 +32,3 @@ jobs:
             git commit -m "Automated update of OpenAI IPs"
             git push
           fi
-
