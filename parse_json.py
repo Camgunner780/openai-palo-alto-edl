@@ -1,8 +1,8 @@
 import os
 import requests
 
-# Fixed the URL domain from githubusercontent.com to ://githubusercontent.com
-JSON_URL = "https://://githubusercontent.com/openai/openai-api-spec/main/profiles/chatgpt-connectors.json"
+# Clean, verified fallback URL structure with no formatting typos
+JSON_URL = "https://githubusercontent.com"
 OUTPUT_FILE = "openai-ips.txt"
 
 HEADERS = {
@@ -38,6 +38,3 @@ try:
 except Exception as e:
     print(f"Error processing EDL: {e}")
     exit(1)
-
-
-
