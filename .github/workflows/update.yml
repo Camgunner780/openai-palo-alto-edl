@@ -1,0 +1,37 @@
+name: Daily OpenAI EDL Update
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Runs automatically every day at 4:00 AM UTC
+  workflow_dispatch:      # Allows you to click a button to run it manually anytime
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Parser Script
+        run: python parse_json.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add openai-ips.txt
+          # Only commit and push if the file actually changed
+          if git diff --staged --quiet; then
+            echo "No changes in IP addresses detected."
+          else
+            git commit -m "Automated update of OpenAI IPs"
+            git push
+          fi
