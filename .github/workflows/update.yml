@@ -5,6 +5,11 @@ on:
     - cron: '0 4 * * *'  # Runs automatically every day at 4:00 AM UTC
   workflow_dispatch:      # Allows you to click a button to run it manually anytime
 
+# Prevents multiple deployments from trying to run at the exact same time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 # Grant permissions required for both committing code changes and deploying to GitHub Pages
 permissions:
   contents: write
@@ -41,7 +46,6 @@ jobs:
       - name: Upload text artifact for Pages hosting
         uses: actions/upload-pages-artifact@v3
         with:
-          # Tell GitHub to upload the root directory containing your text file
           path: '.'
 
       - name: Deploy changes to GitHub Pages live server
