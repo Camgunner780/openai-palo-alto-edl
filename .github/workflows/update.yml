@@ -5,6 +5,12 @@ on:
     - cron: '0 4 * * *'  # Runs automatically every day at 4:00 AM UTC
   workflow_dispatch:      # Allows you to click a button to run it manually anytime
 
+# Grant permissions required for both committing code changes and deploying to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -15,13 +21,12 @@ jobs:
       - name: Fetch and Process IP List via JQ
         run: |
           echo "Fetching verified mirror data..."
-          # Download file and parse the dynamic JSON blocks flawlessly using JQ
           curl -s -A "Mozilla/5.0" "https://githubusercontent.com" | jq -r '.prefixes[].ip_prefix' > openai-ips.txt
           
           echo "Processing complete. Reviewing outputs:"
           cat openai-ips.txt
 
-      - name: Commit and Push changes
+      - name: Commit and Push changes back to code branch
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
@@ -32,3 +37,12 @@ jobs:
             git commit -m "Automated update of OpenAI IPs"
             git push
           fi
+
+      - name: Upload text artifact for Pages hosting
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Tell GitHub to upload the root directory containing your text file
+          path: '.'
+
+      - name: Deploy changes to GitHub Pages live server
+        uses: actions/deploy-pages@v4
